@@ -15,7 +15,7 @@ from sumy.summarizers.lex_rank import LexRankSummarizer
 import nltk
 from nltk import sent_tokenize, word_tokenize, pos_tag
 import random
-nltk.data.load('tokenizers/punkt/english.pickle')
+
 
 
 nltk.download('punkt')
