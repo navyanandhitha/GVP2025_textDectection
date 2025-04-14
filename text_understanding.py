@@ -6,13 +6,8 @@ import pyttsx3
 import tempfile
 import os
 import PyPDF2
-
-
 import nltk
-
-# Download punkt tokenizer model
-nltk.download('punkt')
-
+from nltk import sent_tokenize, word_tokenize, pos_tag
 import re
 from sumy.parsers.plaintext import PlaintextParser
 from sumy.nlp.tokenizers import Tokenizer
@@ -20,9 +15,23 @@ from sumy.summarizers.lex_rank import LexRankSummarizer
 import nltk
 from nltk import sent_tokenize, word_tokenize, pos_tag
 import random
+nltk.data.load('tokenizers/punkt/english.pickle')
+
 
 nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
+import nltk
+
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    nltk.download('punkt')
+
+# Use the standard punkt tokenizer
+from nltk.tokenize import sent_tokenize
+text = "This is a test. This is another sentence."
+sentences = sent_tokenize(text)
+print(sentences)
 
 # --- SETUP ---
 st.set_page_config(page_title="Smart Text App", layout="centered")
