@@ -6,21 +6,15 @@ import pyttsx3
 import tempfile
 import os
 import PyPDF2
-import nltk
-from nltk import sent_tokenize, word_tokenize, pos_tag
 import re
 from sumy.parsers.plaintext import PlaintextParser
 from sumy.nlp.tokenizers import Tokenizer
 from sumy.summarizers.lex_rank import LexRankSummarizer
-import nltk
-from nltk import sent_tokenize, word_tokenize, pos_tag
 import random
-
-
-
-nltk.download('punkt_tab')
-nltk.download('averaged_perceptron_tagger')
-
+import nltk
+nltk.download('averaged_perceptron_tagger', download_dir='nltk_data')
+nltk.download('punkt', download_dir='nltk_data')
+from nltk import sent_tokenize, word_tokenize, pos_tag
 # --- SETUP ---
 st.set_page_config(page_title="Smart Text App", layout="centered")
 st.title("🌐 Advanced Smart Text Understanding App")
