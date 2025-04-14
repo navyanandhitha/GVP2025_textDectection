@@ -6,7 +6,13 @@ import pyttsx3
 import tempfile
 import os
 import PyPDF2
-import nltk_download
+
+
+import nltk
+
+# Download punkt tokenizer model
+nltk.download('punkt')
+
 import re
 from sumy.parsers.plaintext import PlaintextParser
 from sumy.nlp.tokenizers import Tokenizer
