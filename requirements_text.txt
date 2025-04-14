@@ -1,0 +1,9 @@
+streamlit
+langdetect
+googletrans==4.0.0-rc1
+gTTS
+pyttsx3
+PyPDF2
+sumy
+nltk
+pyaudio ; platform_system=="Windows"
