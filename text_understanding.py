@@ -20,18 +20,6 @@ nltk.data.load('tokenizers/punkt/english.pickle')
 
 nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
-import nltk
-
-try:
-    nltk.data.find('tokenizers/punkt')
-except LookupError:
-    nltk.download('punkt')
-
-# Use the standard punkt tokenizer
-from nltk.tokenize import sent_tokenize
-text = "This is a test. This is another sentence."
-sentences = sent_tokenize(text)
-print(sentences)
 
 # --- SETUP ---
 st.set_page_config(page_title="Smart Text App", layout="centered")
