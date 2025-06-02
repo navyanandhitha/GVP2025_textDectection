@@ -1,7 +1,8 @@
+
+
 streamlit
 langdetect
-googletrans==4.0.0rc1
+googletrans==4.0.0-rc1
 gTTS
 pyttsx3
 PyPDF2
-sumy
