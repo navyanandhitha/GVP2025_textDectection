@@ -8,6 +8,10 @@ import os
 import PyPDF2
 import re
 import random
+import cgi                                                             
+import datetime                                                        
+import email.message                                                   
+import json as jsonlib     
 
 st.set_page_config(page_title="Smart Text App", layout="centered")
 st.title("🌐 Advanced Smart Text Understanding App")
