@@ -8,16 +8,14 @@ import os
 import PyPDF2
 import re
 import random
-import cgi                                                             
-import datetime                                                        
-import email.message                                                   
-import json as jsonlib     
 
+# Set Streamlit page config
 st.set_page_config(page_title="Smart Text App", layout="centered")
 st.title("🌐 Advanced Smart Text Understanding App")
 
 translator = Translator()
 
+# Theme toggle
 theme = st.sidebar.radio("Choose Theme", ["Light", "Dark"])
 if theme == "Dark":
     st.markdown("""
@@ -29,6 +27,7 @@ if theme == "Dark":
     </style>
     """, unsafe_allow_html=True)
 
+# Language selection
 language_map = {
     "English": "en", "Hindi": "hi", "Spanish": "es", "French": "fr",
     "German": "de", "Italian": "it", "Chinese": "zh-cn", "Japanese": "ja",
@@ -38,22 +37,27 @@ language_map = {
 selected_lang_name = st.selectbox("🌍 Output Language (Text & Voice)", list(language_map.keys()))
 selected_lang_code = language_map[selected_lang_name]
 
+# TTS options
 tts_mode = st.radio("TTS Mode", ["Online (gTTS)", "Offline (pyttsx3 - English only)"])
 voice_enabled = st.checkbox("Enable voice output")
 
+# File or text input
 uploaded_file = st.file_uploader("📌 Upload PDF or .txt", type=["pdf", "txt"])
 text_input = st.text_area("📄 Or paste your text here:", height=250)
 
+# Text extraction
 def extract_text_from_pdf(file):
     reader = PyPDF2.PdfReader(file)
     return "".join(page.extract_text() or "" for page in reader.pages)
 
+# Q&A logic
 def find_answer(text, question):
     sentences = re.split(r'(?<=[.!?]) +', text)
     keywords = [w.lower() for w in question.split() if len(w) > 2]
     best = max(sentences, key=lambda s: sum(k in s.lower() for k in keywords), default="Sorry, I couldn't find an answer.")
     return best
 
+# TTS function
 def speak_text(text, lang):
     if tts_mode.startswith("Online"):
         tts = gTTS(text, lang=lang)
@@ -68,6 +72,7 @@ def speak_text(text, lang):
         engine.runAndWait()
         return temp_path
 
+# Quiz generator
 def generate_quiz_questions(text, num_questions=5):
     sentences = re.split(r'(?<=[.!?]) +', text)
     questions = []
@@ -82,6 +87,7 @@ def generate_quiz_questions(text, num_questions=5):
             break
     return questions
 
+# Load and show text
 main_text = ""
 if uploaded_file:
     if uploaded_file.type == "application/pdf":
@@ -95,8 +101,10 @@ if main_text:
     st.subheader("📃 Loaded Text Preview")
     st.text(main_text[:800] + ("..." if len(main_text) > 800 else ""))
 
+# Question input
 question = st.text_input("❓ Ask a question from the text:")
 
+# Answering
 if st.button("Get Answer") and question:
     detected_lang = detect(main_text)
     main_text_en = translator.translate(main_text, dest="en").text if detected_lang != 'en' else main_text
@@ -116,6 +124,7 @@ if st.button("Get Answer") and question:
 
     st.download_button("📄 Download Answer as Text", answer_translated, file_name="answer.txt")
 
+# Quiz generation
 if st.button("Generate Quiz Questions"):
     detected_lang = detect(main_text)
     main_text_en = translator.translate(main_text, dest="en").text if detected_lang != 'en' else main_text
@@ -138,6 +147,5 @@ if st.button("Generate Quiz Questions"):
     st.download_button("📄 Download Quiz as Text",
                        "\n\n".join([f"Q{i}: {q}\nA: {a}" for i, (q, a) in enumerate(questions, 1)]),
                        file_name="quiz.txt")
-
 else:
     st.info("Upload a file or paste some text to start.")
