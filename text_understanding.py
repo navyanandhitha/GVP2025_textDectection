@@ -7,9 +7,6 @@ import tempfile
 import os
 import PyPDF2
 import re
-from sumy.parsers.plaintext import PlaintextParser
-from sumy.nlp.tokenizers import Tokenizer
-from sumy.summarizers.lex_rank import LexRankSummarizer
 import random
 
 st.set_page_config(page_title="Smart Text App", layout="centered")
@@ -29,21 +26,10 @@ if theme == "Dark":
     """, unsafe_allow_html=True)
 
 language_map = {
-    "English": "en",
-    "Hindi": "hi",
-    "Spanish": "es",
-    "French": "fr",
-    "German": "de",
-    "Italian": "it",
-    "Chinese": "zh-cn",
-    "Japanese": "ja",
-    "Russian": "ru",
-    "Arabic": "ar",
-    "Bengali": "bn",
-    "Tamil": "ta",
-    "Telugu": "te",
-    "Kannada": "kn",
-    "Malayalam": "ml"
+    "English": "en", "Hindi": "hi", "Spanish": "es", "French": "fr",
+    "German": "de", "Italian": "it", "Chinese": "zh-cn", "Japanese": "ja",
+    "Russian": "ru", "Arabic": "ar", "Bengali": "bn", "Tamil": "ta",
+    "Telugu": "te", "Kannada": "kn", "Malayalam": "ml"
 }
 selected_lang_name = st.selectbox("🌍 Output Language (Text & Voice)", list(language_map.keys()))
 selected_lang_code = language_map[selected_lang_name]
@@ -57,12 +43,6 @@ text_input = st.text_area("📄 Or paste your text here:", height=250)
 def extract_text_from_pdf(file):
     reader = PyPDF2.PdfReader(file)
     return "".join(page.extract_text() or "" for page in reader.pages)
-
-def summarize_text(text, num_sentences=5):
-    parser = PlaintextParser.from_string(text, Tokenizer("english"))
-    summarizer = LexRankSummarizer()
-    summary = summarizer(parser.document, num_sentences)
-    return " ".join(str(sentence) for sentence in summary)
 
 def find_answer(text, question):
     sentences = re.split(r'(?<=[.!?]) +', text)
@@ -87,25 +67,16 @@ def speak_text(text, lang):
 def generate_quiz_questions(text, num_questions=5):
     sentences = re.split(r'(?<=[.!?]) +', text)
     questions = []
-
     for sentence in sentences:
-        words = [word for word in re.findall(r'\b\w+\b', sentence) if len(word) > 3] # Extract words longer than 3 chars
+        words = [word for word in re.findall(r'\b\w+\b', sentence) if len(word) > 3]
         if words:
             chosen_word = random.choice(words)
-            question = sentence.replace(chosen_word, "_", 1) # Replace only the first occurrence
+            question = sentence.replace(chosen_word, "_", 1)
             correct_answer = chosen_word
             questions.append((question, correct_answer))
-
         if len(questions) >= num_questions:
             break
-
     return questions
-
-def safe_detect(text):
-    try:
-        return detect(text) if text.strip() else "en"
-    except:
-        return "en"
 
 main_text = ""
 if uploaded_file:
@@ -123,7 +94,7 @@ if main_text:
 question = st.text_input("❓ Ask a question from the text:")
 
 if st.button("Get Answer") and question:
-    detected_lang = safe_detect(main_text)
+    detected_lang = detect(main_text)
     main_text_en = translator.translate(main_text, dest="en").text if detected_lang != 'en' else main_text
 
     answer_en = find_answer(main_text_en, question)
@@ -141,26 +112,8 @@ if st.button("Get Answer") and question:
 
     st.download_button("📄 Download Answer as Text", answer_translated, file_name="answer.txt")
 
-if st.button("Summarize Text"):
-    detected_lang = safe_detect(main_text)
-    main_text_en = translator.translate(main_text, dest="en").text if detected_lang != 'en' else main_text
-    summary_en = summarize_text(main_text_en)
-    summary_translated = translator.translate(summary_en, dest=selected_lang_code).text if selected_lang_code != "en" else summary_en
-
-    st.subheader("📝 Summary")
-    st.info(summary_translated)
-
-    if voice_enabled:
-        st.subheader("🔊 Listen to Summary")
-        audio_file = speak_text(summary_translated, selected_lang_code)
-        st.audio(audio_file)
-        with open(audio_file, "rb") as af:
-            st.download_button("📅 Download Summary Audio", af, file_name="summary.mp3")
-
-    st.download_button("📄 Download Summary as Text", summary_translated, file_name="summary.txt")
-
 if st.button("Generate Quiz Questions"):
-    detected_lang = safe_detect(main_text)
+    detected_lang = detect(main_text)
     main_text_en = translator.translate(main_text, dest="en").text if detected_lang != 'en' else main_text
 
     questions = generate_quiz_questions(main_text_en)
@@ -178,7 +131,9 @@ if st.button("Generate Quiz Questions"):
             audio_file = speak_text(translated_q, selected_lang_code)
             st.audio(audio_file)
 
-    st.download_button("📄 Download Quiz as Text", "\n\n".join([f"Q{i}: {q}\nA: {a}" for i, (q, a) in enumerate(questions, 1)]), file_name="quiz.txt")
+    st.download_button("📄 Download Quiz as Text",
+                       "\n\n".join([f"Q{i}: {q}\nA: {a}" for i, (q, a) in enumerate(questions, 1)]),
+                       file_name="quiz.txt")
 
 else:
     st.info("Upload a file or paste some text to start.")
